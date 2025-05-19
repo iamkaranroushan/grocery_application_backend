@@ -7,6 +7,7 @@ import { schema } from "./src/graphql/schema.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import { exec } from "child_process";
 dotenv.config();
 
 // Create express app
@@ -22,12 +23,20 @@ const io = new SocketIOServer(server, {
     origin: [
       "http://localhost:3000",
       "http://192.168.1.3:3000",
+      "https://grocery-application-frontend.onrender.com/"
     ],
     credentials: true,
   },
 
 });
 
+exec('npx prisma db push', (err, stdout, stderr) => {
+  if (err) {
+    console.error(`Prisma push error: ${err.message}`);
+    return;
+  }
+  console.log(`Prisma push output:\n${stdout}`);
+});
 // Handle socket connections
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -52,7 +61,7 @@ io.on("connection", (socket) => {
   socket.on("orderUpdated", (orderData) => {
     const userRoom = `user-${orderData.id}`;
     io.to(userRoom).emit("updatedOrder", { message: "New order updated", order: orderData });
-    console.log("order update:",userRoom, orderData);
+    console.log("order update:", userRoom, orderData);
   })
 
 
@@ -71,6 +80,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://192.168.1.3:3000",
+      "https://grocery-application-frontend.onrender.com/"
     ],
     credentials: true,
   })
@@ -107,5 +117,5 @@ app.use(
 
 // Start HTTP + WebSocket server
 server.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
+  console.log(`Server listening on https://grocery-application-frontend.onrender.com/`);
 });
