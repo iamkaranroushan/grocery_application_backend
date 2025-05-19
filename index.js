@@ -7,7 +7,7 @@ import { schema } from "./src/graphql/schema.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import { exec } from "child_process";
+
 dotenv.config();
 
 // Create express app
@@ -23,20 +23,14 @@ const io = new SocketIOServer(server, {
     origin: [
       "http://localhost:3000",
       "http://192.168.1.3:3000",
-      "https://grocery-application-frontend.onrender.com/"
+      "https://grocery-application-frontend.onrender.com"
     ],
     credentials: true,
   },
 
 });
 
-exec('npx prisma db push', (err, stdout, stderr) => {
-  if (err) {
-    console.error(`Prisma push error: ${err.message}`);
-    return;
-  }
-  console.log(`Prisma push output:\n${stdout}`);
-});
+
 // Handle socket connections
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -80,7 +74,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://192.168.1.3:3000",
-      "https://grocery-application-frontend.onrender.com/"
+      "https://grocery-application-frontend.onrender.com"
     ],
     credentials: true,
   })
