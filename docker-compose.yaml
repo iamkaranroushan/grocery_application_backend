@@ -1,0 +1,40 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: grocery-app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/grocery_server
+      - JWT_SECRET=jwtsecret
+      - NODE_ENV=development
+      - PORT=8000
+    ports:
+      - "2222:8000"
+      - "3333:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    networks:
+      - grocery-network
+
+  db:
+    image: postgres:13-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: grocery_server
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - grocery-network
+
+volumes:
+  postgres-data:
+
+networks:
+  grocery-network:
+    driver: bridge

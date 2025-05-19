@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  email         String         @unique
+  password      String
+  role          String         @default("customer")
+  orders        Order[] // Orders related to the user
+  cart          Cart?          @relation // Cart related to the user (no onDelete here)
+  imageUrl      String?
+  reviews       Review[] // Reviews by the user
+  addresses     Address[] // Addresses related to the user
+  payments      Payment[] // Payments made by the user
+  wishlist      Wishlist? // Wishlist of the user (if exists)
+  cartId        Int?
+  wishlistId    Int?
+  notifications Notification[]
+}
+
+// Product model
+model Product {
+  id            Int              @id @default(autoincrement())
+  name          String
+  description   String
+  categoryId    Int
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  imageUrl      String?
+  isActive      Boolean          @default(true)
+  variants      ProductVariant[] // Variants of the product
+  orderItems    OrderItem[] // Order items containing this product
+  reviews       Review[] // Reviews of this product
+  wishlistItems WishlistItem[] // Wishlist items containing this product
+}
+
+model ProductVariant {
+  id        Int         @id @default(autoincrement())
+  productId Int
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade) // Cascade delete if product is deleted
+  weight    String // Example: "100g", "500g", "1kg"
+  price     Float // Price for the specific weight
+  stock     Int // Available stock for this variant
+  cartItems CartItem[] // Cart items related to this product variant
+  OrderItem OrderItem[] // Order items related to this product variant
+}
+
+// Category model
+model Category {
+  id               Int        @id @default(autoincrement())
+  name             String
+  description      String?
+  imageUrl         String?
+  parentCategoryId Int?
+  parentCategory   Category?  @relation("CategoryParent", fields: [parentCategoryId], references: [id], onDelete: Cascade)
+  subCategories    Category[] @relation("CategoryParent")
+  products         Product[] // Products under this category
+}
+
+// Order model
+model Order {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  addressId       Int
+  status          OrderStatus   @default(PENDING)
+  totalPrice      Float
+  shippingAddress Address       @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  orderDate       DateTime      @default(now())
+  deliveryDate    DateTime?
+  paymentMethod   PaymentMethod @default(COD)
+  isPaid          Boolean       @default(false)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[] // Order items within this order
+}
+
+// Order item model
+model OrderItem {
+  id              Int             @id @default(autoincrement())
+  orderId         Int
+  productId       Int
+  variantId       Int?
+  quantity        Int
+  priceAtPurchase Float
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade) // Cascade delete product if order item is deleted
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+}
+
+// Cart model
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete user if cart is deleted
+  cartItems CartItem[] // Cart items in this cart
+}
+
+// CartItem model
+model CartItem {
+  id               Int            @id @default(autoincrement())
+  cartId           Int
+  productVariantId Int
+  quantity         Int
+  cart             Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade) // Cascade delete cart item if cart is deleted
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade) // Cascade delete product variant if cart item is deleted
+}
+
+// Review model
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // Cascade delete review if product is deleted
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete review if user is deleted
+}
+
+// Address model
+model Address {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  streetAddress String
+  landmark      String?
+  city          String
+  state         String
+  country       String   @default("India")
+  zipCode       String
+  phoneNumber   String // Added phone number for completeness
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete address if user is deleted
+  Orders        Order[] // Orders linked to this address
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Payment model
+model Payment {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  orderId       Int
+  amount        Float
+  paymentStatus String
+  paymentMethod String
+  paymentDate   DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete payment if user is deleted
+}
+
+// Wishlist model
+model Wishlist {
+  id            Int            @id @default(autoincrement())
+  userId        Int            @unique
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete wishlist if user is deleted
+  wishlistItems WishlistItem[] // Wishlist items in the wishlist
+}
+
+// WishlistItem model
+model WishlistItem {
+  id         Int      @id @default(autoincrement())
+  wishlistId Int
+  productId  Int
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade) // Cascade delete wishlist item if wishlist is deleted
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // Cascade delete product if wishlist item is deleted
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  type        String // e.g., "NEW_ORDER", "ORDER_STATUS", etc.
+  title       String?
+  message     String
+  isRead      Boolean  @default(false)
+  recipientId Int // The user who should see this
+  createdAt   DateTime @default(now())
+  orderId     Int // Optional: link to the related order
+  user        User     @relation(fields: [recipientId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  ONLINE
+}
