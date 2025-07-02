@@ -7,7 +7,7 @@ import { schema } from "./src/graphql/schema.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
+import authRoutes from "./src/routes/authRoute.js"
 dotenv.config();
 
 // Create express app
@@ -21,8 +21,8 @@ const server = createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: [
-      "http://localhost:3000",
-      "http://192.168.1.3:3000",
+      "http://127.0.0.1:3000",
+      "http://192.168.1.5:3000",
       "https://grocery-application-frontend.onrender.com"
     ],
     credentials: true,
@@ -72,8 +72,8 @@ io.on("connection", (socket) => {
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
-      "http://192.168.1.3:3000",
+      "http://127.0.0.1:3000",
+      "http://192.168.1.5:3000",
       "https://grocery-application-frontend.onrender.com"
     ],
     credentials: true,
@@ -89,6 +89,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.use('/auth', authRoutes);
 // Basic route
 app.get("/", (req, res) => {
   res.send(

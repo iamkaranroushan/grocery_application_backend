@@ -109,7 +109,7 @@ export const resolvers = {
   },
 
   createAddress: async ({ input }) => {
-    const { userId, streetAddress, landmark, city, state, postalCode, phoneNumber } = input;
+    const { userId, streetAddress, landmark, city, state, postalCode } = input;
 
     try {
       // Create a new address
@@ -121,7 +121,6 @@ export const resolvers = {
           city,
           state,
           zipCode: postalCode,
-          phoneNumber,
         },
       });
 
@@ -183,7 +182,6 @@ export const resolvers = {
           city: data.city,
           state: data.state,
           zipCode: data.postalCode || data.zipCode, // handle either field
-          phoneNumber: data.phoneNumber,
           landmark: data.landmark,
         },
       });
@@ -382,9 +380,13 @@ export const resolvers = {
       where: {
         parentCategoryId: null,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       include: {
         subCategories: true,
       },
+
     });
   },
 
@@ -474,6 +476,9 @@ export const resolvers = {
           }
         }
       }, // Include product variants
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
   },
 
@@ -489,7 +494,8 @@ export const resolvers = {
           create: variants.map(variant => ({
             weight: variant.weight,  // Now a string ("100g", "500g", etc.)
             price: variant.price,
-            stock: variant.stock,    // Include stock quantity
+            mrp: variant.mrp,
+            inStock: variant.inStock,    // Include stock quantity
           })),
         },
       },
@@ -515,7 +521,7 @@ export const resolvers = {
           name: input.name || undefined,
           description: input.description || undefined,
           imageUrl: input.imageUrl || undefined,
-          isActive: input.isActive ?? undefined,
+          isActive: typeof input.isActive !== 'undefined' ? input.isActive : undefined,
         },
       });
 
@@ -529,7 +535,8 @@ export const resolvers = {
               data: {
                 weight: variant.weight || undefined,
                 price: variant.price || undefined,
-                stock: variant.stock || undefined,
+                mrp: variant.mrp || undefined,
+                inStock: typeof variant.inStock !== 'undefined' ? variant.inStock : undefined,
               },
             });
           } else {
@@ -539,7 +546,8 @@ export const resolvers = {
                 productId: id,
                 weight: variant.weight,
                 price: variant.price,
-                stock: variant.stock,
+                mrp: variant.mrp,
+                inStock: variant.inStock
               },
             });
           }

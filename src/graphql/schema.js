@@ -43,7 +43,8 @@ export const schema = buildSchema(`
     product: Product
     weight: String!  # 🔹 Example: "100g", "500g", "1kg"
     price: Float!    # 🔹 Price for this weight
-    stock: Int!      # 🔹 Stock availability
+    mrp: Float!
+    inStock: Boolean!      # 🔹 Stock availability
   }
 
   
@@ -176,7 +177,6 @@ export const schema = buildSchema(`
     state: String!
     country: String!
     zipCode: String!
-    phoneNumber: String!
   }
   type Order {
     id: Int!
@@ -286,7 +286,6 @@ export const schema = buildSchema(`
   city: String!
   state: String!
   postalCode: String!
-  phoneNumber: String!
   landmark: String
 }
 
@@ -314,10 +313,12 @@ export const schema = buildSchema(`
     name: String
     imageUrl: String
   }
+
   input ProductVariantInput {
     weight: String!     
-    price: Float!       
-    stock: Int!        
+    price: Float!    
+    mrp: Float!   
+    inStock: Boolean!
   }
   
   input UpdateProductInput {
@@ -332,8 +333,9 @@ export const schema = buildSchema(`
   input UpdateVariantInput {
     id: Int
     weight: String
+    mrp: Float
     price: Float
-    stock: Int
+    inStock: Boolean
   }
 
   input CreateAddressInput {
@@ -343,6 +345,5 @@ export const schema = buildSchema(`
     city: String!
     state: String!
     postalCode: String!
-    phoneNumber: String!
   }
 `);

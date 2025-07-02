@@ -10,9 +10,8 @@ datasource db {
 // User model
 model User {
   id            Int            @id @default(autoincrement())
-  username      String         @unique
-  email         String         @unique
-  password      String
+  username      String?
+  phoneNumber   String         @unique
   role          String         @default("customer")
   orders        Order[] // Orders related to the user
   cart          Cart?          @relation // Cart related to the user (no onDelete here)
@@ -26,6 +25,15 @@ model User {
   notifications Notification[]
 }
 
+model OtpRequest {
+  id          Int      @id @default(autoincrement())
+  phoneNumber String
+  otp         String
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  isUsed      Boolean  @default(false)
+}
+
 // Product model
 model Product {
   id            Int              @id @default(autoincrement())
@@ -35,21 +43,26 @@ model Product {
   category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   imageUrl      String?
   isActive      Boolean          @default(true)
-  variants      ProductVariant[] // Variants of the product
-  orderItems    OrderItem[] // Order items containing this product
-  reviews       Review[] // Reviews of this product
-  wishlistItems WishlistItem[] // Wishlist items containing this product
+  variants      ProductVariant[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime?        @updatedAt
 }
 
 model ProductVariant {
   id        Int         @id @default(autoincrement())
   productId Int
-  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade) // Cascade delete if product is deleted
-  weight    String // Example: "100g", "500g", "1kg"
-  price     Float // Price for the specific weight
-  stock     Int // Available stock for this variant
-  cartItems CartItem[] // Cart items related to this product variant
-  OrderItem OrderItem[] // Order items related to this product variant
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  weight    String
+  price     Float
+  mrp       Float? // Optional MRP (for strike-through display)
+  inStock   Boolean     @default(true) // true if available, false if sold out
+  cartItems CartItem[]
+  OrderItem OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime?   @updatedAt
 }
 
 // Category model
@@ -61,7 +74,9 @@ model Category {
   parentCategoryId Int?
   parentCategory   Category?  @relation("CategoryParent", fields: [parentCategoryId], references: [id], onDelete: Cascade)
   subCategories    Category[] @relation("CategoryParent")
-  products         Product[] // Products under this category
+  products         Product[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime?  @updatedAt
 }
 
 // Order model
@@ -133,7 +148,6 @@ model Address {
   state         String
   country       String   @default("India")
   zipCode       String
-  phoneNumber   String // Added phone number for completeness
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete address if user is deleted
   Orders        Order[] // Orders linked to this address
   createdAt     DateTime @default(now())
@@ -177,7 +191,7 @@ model Notification {
   isRead      Boolean  @default(false)
   recipientId Int // The user who should see this
   createdAt   DateTime @default(now())
-  orderId     Int // Optional: link to the related order
+  orderId     Int? // Optional: link to the related order
   user        User     @relation(fields: [recipientId], references: [id])
 }
 
