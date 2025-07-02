@@ -23,7 +23,7 @@ const io = new SocketIOServer(server, {
     origin: [
       "http://127.0.0.1:3000",
       "http://192.168.1.5:3000",
-      "https://grocery-application-frontend.onrender.com"
+      process.env.PRODUCTION_URL,
     ],
     credentials: true,
   },
@@ -74,7 +74,7 @@ app.use(
     origin: [
       "http://127.0.0.1:3000",
       "http://192.168.1.5:3000",
-      "https://grocery-application-frontend.onrender.com"
+      process.env.PRODUCTION_URL
     ],
     credentials: true,
   })
@@ -113,5 +113,5 @@ app.use(
 
 // Start HTTP + WebSocket server
 server.listen(port, () => {
-  console.log(`Server listening on https://grocery-application-frontend.onrender.com/`);
+  console.log(`Server listening on ${port}`);
 });
