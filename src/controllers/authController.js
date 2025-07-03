@@ -119,7 +119,7 @@ const verifyOtp = async (req, res) => {
         const isLocal = req.hostname === 'localhost' || req.hostname.startsWith('192.');
 
         res.cookie("jwtToken", jwtToken, {
-            httpOnly: true,
+            httpOnly: false,
             sameSite: "none",
             secure: true,
             maxAge: oneDayInMillis,
@@ -140,7 +140,7 @@ const verifyOtp = async (req, res) => {
 const logoutUser = async (req, res) => {
     try {
         res.clearCookie("jwtToken", {
-            httpOnly: true,
+            httpOnly: false,
             sameSite: "none", // adjust if you're using secure cookies
             secure: true, // true in prod
         });
