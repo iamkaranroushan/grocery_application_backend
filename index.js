@@ -25,7 +25,7 @@ const io = new SocketIOServer(server, {
       "http://192.168.1.5:3000",
       "https://grocery-application-frontend-ten.vercel.app",
       "https://grocery-application-fronte-git-81b715-iamkaranroushans-projects.vercel.app",
-      process.env.PRODUCTION_URL,
+      
     ],
     credentials: true,
   },
@@ -76,9 +76,9 @@ app.use(
     origin: [
       "http://127.0.0.1:3000",
       "http://192.168.1.5:3000",
-      "https://grocery-application-frontend-ten.vercel.app",
-      "https://grocery-application-fronte-git-81b715-iamkaranroushans-projects.vercel.app",
-      process.env.PRODUCTION_URL
+      "https://grocery-application-frontend-ten.vercel.app/",
+      "https://grocery-application-fronte-git-81b715-iamkaranroushans-projects.vercel.app/",
+     
     ],
     credentials: true,
   })

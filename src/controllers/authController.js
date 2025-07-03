@@ -120,8 +120,8 @@ const verifyOtp = async (req, res) => {
 
         res.cookie("jwtToken", jwtToken, {
             httpOnly: true,
-            sameSite: isLocal ? "lax" : "none",
-            secure: !isLocal,
+            sameSite: "none",
+            secure: true,
             maxAge: oneDayInMillis,
         });
 
@@ -141,8 +141,8 @@ const logoutUser = async (req, res) => {
     try {
         res.clearCookie("jwtToken", {
             httpOnly: true,
-            sameSite: "lax", // adjust if you're using secure cookies
-            secure: process.env.NODE_ENV === "production", // true in prod
+            sameSite: "none", // adjust if you're using secure cookies
+            secure: true, // true in prod
         });
         res.status(200).json({ message: "Logged out successfully." });
     } catch (err) {
