@@ -66,7 +66,7 @@ const generateToken = (tokenData) => {
 
 const verifyOtp = async (req, res) => {
     const { idToken } = req.body;
-    console.log("idToken: ",idToken);
+    console.log("idToken: ", idToken);
 
     if (!idToken) {
         return res.status(400).json({ error: "ID token is required" });
@@ -76,8 +76,8 @@ const verifyOtp = async (req, res) => {
         // 🧾 Verify Firebase ID token
         const decoded = await admin.auth().verifyIdToken(idToken);
         const phoneNumber = decoded.phone_number;
-        console.log("phone number is:",phoneNumber); 
-        
+        console.log("phone number is:", phoneNumber);
+
         if (!phoneNumber) {
             return res.status(400).json({ error: "Phone number missing in token" });
         }
@@ -119,8 +119,9 @@ const verifyOtp = async (req, res) => {
         const isLocal = req.hostname === 'localhost' || req.hostname.startsWith('192.');
 
         res.cookie("jwtToken", jwtToken, {
-            sameSite: "none",
-            secure: true,
+            httpOnly: true,
+            sameSite: isLocal ? "lax" : "none",
+            secure: !isLocal,
             maxAge: oneDayInMillis,
         });
 
@@ -137,10 +138,12 @@ const verifyOtp = async (req, res) => {
 
 
 const logoutUser = async (req, res) => {
+    const isLocal = req.hostname === 'localhost' || req.hostname.startsWith('192.');
     try {
         res.clearCookie("jwtToken", {
-            sameSite: "none", // adjust if you're using secure cookies
-            secure: true, // true in prod
+            httpOnly: true,
+            sameSite: isLocal ? "lax" : "none", // adjust if you're using secure cookies
+            secure: process.env.NODE_ENV === "production", // true in prod
         });
         res.status(200).json({ message: "Logged out successfully." });
     } catch (err) {
@@ -150,4 +153,4 @@ const logoutUser = async (req, res) => {
 };
 
 
-export default {verifyOtp, logoutUser };
+export default { verifyOtp, logoutUser };
