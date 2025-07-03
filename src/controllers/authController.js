@@ -117,7 +117,7 @@ const verifyOtp = async (req, res) => {
 
         const oneDayInMillis = 24 * 60 * 60 * 1000;
         const isLocal = req.hostname === 'localhost' || req.hostname.startsWith('192.');
-
+        console.log("islocal:",isLocal);
         res.cookie("jwtToken", jwtToken, {
             httpOnly: true,
             sameSite: isLocal ? "lax" : "none",
@@ -143,7 +143,7 @@ const logoutUser = async (req, res) => {
         res.clearCookie("jwtToken", {
             httpOnly: true,
             sameSite: isLocal ? "lax" : "none", // adjust if you're using secure cookies
-            secure: process.env.NODE_ENV === "production", // true in prod
+            secure: !isLocal // true in prod
         });
         res.status(200).json({ message: "Logged out successfully." });
     } catch (err) {

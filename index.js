@@ -21,8 +21,8 @@ const server = createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: [
+      "http://192.168.1.3:3000",
       process.env.PRODUCTION_URL,
-      "http://192.168.1.5:3000",
       "http://127.0.0.1:3000",
     ],
     credentials: true,
@@ -72,8 +72,8 @@ io.on("connection", (socket) => {
 app.use(
   cors({
     origin: [
+      "http://192.168.1.3:3000",
       process.env.PRODUCTION_URL,
-      "http://192.168.1.5:3000",
       "http://127.0.0.1:3000",
     ],
     credentials: true,
