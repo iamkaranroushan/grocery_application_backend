@@ -117,12 +117,11 @@ const verifyOtp = async (req, res) => {
 
         const oneDayInMillis = 24 * 60 * 60 * 1000;
         const isLocal = req.hostname === 'localhost' || req.hostname.startsWith('192.');
-        console.log("islocal:",isLocal);
+        console.log("islocal:", isLocal);
         res.cookie("jwtToken", jwtToken, {
-            httpOnly:!isLocal,
+            httpOnly: !isLocal,
             sameSite: isLocal ? "lax" : "none",
             secure: !isLocal,
-            Domain:"deepakmart.com",
             maxAge: oneDayInMillis,
         });
 
