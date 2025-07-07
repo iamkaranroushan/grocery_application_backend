@@ -122,7 +122,6 @@ const verifyOtp = async (req, res) => {
             httpOnly:!isLocal,
             sameSite: isLocal ? "lax" : "none",
             secure: !isLocal,
-            path: '/',
             maxAge: oneDayInMillis,
         });
 
