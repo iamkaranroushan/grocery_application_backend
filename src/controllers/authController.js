@@ -122,7 +122,7 @@ const verifyOtp = async (req, res) => {
             httpOnly:!isLocal,
             sameSite: isLocal ? "lax" : "none",
             secure: !isLocal,
-            Domain:deepakmart.com,
+            Domain:"deepakmart.com",
             maxAge: oneDayInMillis,
         });
 
