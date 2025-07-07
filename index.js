@@ -18,19 +18,16 @@ const port = process.env.PORT || 8000;
 const server = createServer(app);
 // Setup Socket.IO server
 const io = new SocketIOServer(server, {
-  cors: {
-    origin: (origin, callback) => {
-      const whitelist = [
-        process.env.PRODUCTION_URL,
-      ];
-      if (whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+  cors: ({
+    origin: [
+
+      process.env.PRODUCTION_URL,
+      "http://192.168.1.3:3000",
+      "http://127.0.0.1:3000",
+
+    ], // or your frontend URL
     credentials: true,
-  }
+  })
 
 });
 
@@ -73,21 +70,18 @@ io.on("connection", (socket) => {
 });
 
 // Middleware
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      const whitelist = [
-        process.env.PRODUCTION_URL,
-      ];
-      if (whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      process.env.PRODUCTION_URL,
+      "http://192.168.1.3:3000",
+      "http://127.0.0.1:3000"
+    ],
     credentials: true,
   })
-);
+)
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
