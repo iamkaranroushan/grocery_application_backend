@@ -142,7 +142,7 @@ const logoutUser = async (req, res) => {
         res.clearCookie("jwtToken", {
             httpOnly: true,
             sameSite: "none", // adjust if you're using secure cookies
-            secure: true // true in prod
+            secure: true, // true in prod
             domain:".deepakmart.com"
         });
         res.status(200).json({ message: "Logged out successfully." });
