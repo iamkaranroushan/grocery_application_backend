@@ -143,6 +143,7 @@ const logoutUser = async (req, res) => {
             httpOnly: true,
             sameSite: "none", // adjust if you're using secure cookies
             secure: true // true in prod
+            domain:".deepakmart.com"
         });
         res.status(200).json({ message: "Logged out successfully." });
     } catch (err) {
